@@ -5,11 +5,11 @@
 <p align="center">
 	<br>
 	<br>
-	<a href=https://github.com/Cinpean/ROS_Foosball/blob/main/LICENSE"><img src="https://img.shields.io/github/license/Cinpean/ROS_Foosball?color=blue"></a>
+	<a href=https://github.com/Cinpean/ROS_Foosball/blob/main/LICENSE"><img src="https://img.shields.io/badge/Licence-MIT-blue"></a>
 	|
 	<a href=""><img src="https://img.shields.io/badge/Current_Stage-One-red"></a>
 	|
-	<a href="https://github.com/samyarsadat/ROS-Robot/issues"><img src="https://img.shields.io/github/issues/Cinpean/ROS_Foosball"></a>
+	<a href="https://github.com/Cinpean/ROS_Foosball/issues"><img src="https://img.shields.io/badge/Stauts-Private-cyan"></a>
 	<br><br>
 </p>
 
@@ -20,7 +20,7 @@ The ROS Robot project.
 <br>
 <br>
 <img src="https://github.com/Cinpean/ROS_Foosball/assets/35309003/6adeacbd-e629-4fe4-9997-c4f44ffdd765">
-This is a 3D render of the CAD designs.
+This is a 3D render of the CAD design.
 <br>
 <br>
 
@@ -65,12 +65,12 @@ The Pi 4 handles image processing & sending information to stepper drivers<br>
 ROS is used to handle communications between multiple nodes either on the same machine (i.e. a mapping node and a navigation node running on the Pi 4) or between external nodes (i.e. the two Raspberry Pi Picos running microROS). 
 Both Raspberry Pi Picos are connected to the Pi 4 via USB cables.<br>
 <br>
-More details regarding the electronics design <a href="https://github.com/samyarsadat/ROS-Robot/tree/stage-1/Circuit%20diagrams%20%26%20PCB%20files">here</a>.<br>
+More details regarding the electronics design <a href="https://github.com/Cinpean/ROS_Foosball/tree/main/Circuit_diagam">here</a>.<br>
 <br>
 
 #### Mechanical Design Overview
 The mechanical design of the robot is quite simple. 
-The chassis is 3D printed using PLA filament (more details regarding 3D printing <a href="https://github.com/samyarsadat/ROS-Robot/tree/stage-1/CAD%20files/STL%20files">here</a>) and the robot uses 3 stepper motors and 3 servos<be>
+The chassis is 3D printed using PLA filament (more details regarding 3D printing <a href="https://github.com/Cinpean/ROS_Foosball/tree/main/CAD_Files">here</a>) and the robot uses 3 stepper motors and 3 servos<be>
 
 <br>
 
