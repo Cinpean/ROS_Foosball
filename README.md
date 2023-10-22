@@ -1,9 +1,9 @@
 # ROS_Foosball
-<h1 align="center">The ROS Robot project</h1>
+<h1 align="center">The ROS Foosball Table project</h1>
 
 <p align="center">
 	<br>
-	<a href="https://www.ros.org"><img src="https://github.com/Cinpean/ROS_Foosball/assets/35309003/6677bf4b-b719-4ae4-bd6b-6f2c8b030856">
+	<a href="https://www.ros.org"><img src="https://github.com/Cinpean/ROS_Foosball/assets/35309003/6677bf4b-b719-4ae4-bd6b-6f2c8b030856"></a>
 	<a href="https://www.ros.org"><img src="https://github.com/Cinpean/ROS_Foosball/assets/35309003/29f570fe-21ea-44de-bd70-340f7aa1fd6c" align="right"
      alt="Size Limit logo" width="120" height="178"></a><br>
 	<br>
