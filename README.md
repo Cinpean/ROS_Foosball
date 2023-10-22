@@ -3,7 +3,7 @@
 
 <p align="center">
 	<br>
-	<a href="https://www.ros.org"><img src="https://github.com/Cinpean/ROS_Foosball/tree/main/Assets/Logos_img/ROS.png"></a><br>
+	<a href="https://www.ros.org"><img src="https://github.com/Cinpean/ROS_Foosball/assets/35309003/29f570fe-21ea-44de-bd70-340f7aa1fd6c"></a><br>
 	<br>
 	<br>
 	<a href=https://github.com/Cinpean/ROS_Foosball/blob/main/LICENSE"><img src="https://img.shields.io/github/license/samyarsadat/ROS-Robot?color=blue"></a>
@@ -20,7 +20,7 @@ The ROS Robot project.
 <br>
 <br>
 <br>
-<img src="https://github.com/Cinpean/ROS_Foosball/tree/main/Assets/Renders_img/Foosball_V1.png">
+<img src="https://github.com/Cinpean/ROS_Foosball/assets/35309003/6adeacbd-e629-4fe4-9997-c4f44ffdd765">
 This is a 3D render of the CAD designs.
 <br>
 <br>
