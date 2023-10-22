@@ -3,9 +3,8 @@
 
 <p align="center">
 	<br>
-	<a href="https://www.ros.org"><img src="https://github.com/Cinpean/ROS_Foosball/assets/35309003/6677bf4b-b719-4ae4-bd6b-6f2c8b030856"></a>
-	<a href="https://www.ros.org"><img src="https://github.com/Cinpean/ROS_Foosball/assets/35309003/29f570fe-21ea-44de-bd70-340f7aa1fd6c" align="right"
-     alt="Size Limit logo" width="120" height="178"></a><br>
+	<a href="https://www.ros.org"><img src="https://github.com/Cinpean/ROS_Foosball/assets/35309003/6677bf4b-b719-4ae4-bd6b-6f2c8b030856" align="left" width="1604" height="427"></a>
+	<a href="https://www.ros.org"><img src="https://github.com/Cinpean/ROS_Foosball/assets/35309003/29f570fe-21ea-44de-bd70-340f7aa1fd6c" align="right" alt="Size Limit logo" width="120" height="178"></a><br>
 	<br>
 	<br>
 	<a href=https://github.com/Cinpean/ROS_Foosball/blob/main/LICENSE"><img src="https://img.shields.io/github/license/samyarsadat/ROS-Robot?color=blue"></a>
