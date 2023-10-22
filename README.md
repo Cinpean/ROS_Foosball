@@ -3,14 +3,14 @@
 
 <p align="center">
 	<br>
-	<a href="https://www.ros.org"><img src="https://github.com/samyarsadat/ROS-Robot/raw/stage-1/Assets/Logos/ROS_logo.svg"></a><br>
+	<a href="https://www.ros.org"><img src="https://github.com/Cinpean/ROS_Foosball/tree/main/Assets/Logos_img/Ros.png"></a><br>
 	<br>
 	<br>
-	<a href="https://github.com/samyarsadat/ROS-Robot/blob/dev/LICENSE"><img src="https://img.shields.io/github/license/samyarsadat/ROS-Robot?color=blue"></a>
+	#<a href=https://github.com/Cinpean/ROS_Foosball/blob/main/LICENSE"><img src="https://img.shields.io/github/license/samyarsadat/ROS-Robot?color=blue"></a>
 	|
-	<a href="https://github.com/samyarsadat/ROS-Robot#this-project-will-be-completed-in-stages"><img src="https://img.shields.io/badge/Current_Stage-One-red"></a>
+	<a href=""><img src="https://img.shields.io/badge/Current_Stage-One-red"></a>
 	|
-	<a href="https://github.com/samyarsadat/ROS-Robot/issues"><img src="https://img.shields.io/github/issues/samyarsadat/ROS-Robot"></a>
+	#<a href="https://github.com/samyarsadat/ROS-Robot/issues"><img src="https://img.shields.io/github/issues/samyarsadat/ROS-Robot"></a>
 	<br><br>
 </p>
 
@@ -20,7 +20,7 @@ The ROS Robot project.
 <br>
 <br>
 <br>
-<img src="https://github.com/samyarsadat/ROS-Robot/raw/stage-1/Assets/Renders/GitHub_Render_1_Edited.png">
+<img src="https://github.com/Cinpean/ROS_Foosball/tree/main/Assets/Renders_img">
 This is a 3D render of the CAD designs.
 <br>
 <br>
