@@ -5,7 +5,7 @@
 <p align="center">
 	<br>
 	<br>
-	<a href=https://github.com/Cinpean/ROS_Foosball/blob/main/LICENSE"><img src="https://img.shields.io/badge/Licence-MIT-blue"></a>
+	<a href=https://github.com/Cinpean/ROS_Foosball/blob/main/LICENSE><img src="https://img.shields.io/badge/Licence-MIT-blue"></a>
 	|
 	<a href=""><img src="https://img.shields.io/badge/Current_Stage-One-red"></a>
 	|
