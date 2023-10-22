@@ -5,11 +5,11 @@
 <p align="center">
 	<br>
 	<br>
-	<a href=https://github.com/Cinpean/ROS_Foosball/blob/main/LICENSE"><img src="https://img.shields.io/github/license/samyarsadat/ROS-Robot?color=blue"></a>
+	<a href=https://github.com/Cinpean/ROS_Foosball/blob/main/LICENSE"><img src="https://img.shields.io/github/license/Cinpean/ROS_Foosball?color=blue"></a>
 	|
 	<a href=""><img src="https://img.shields.io/badge/Current_Stage-One-red"></a>
 	|
-	<a href="https://github.com/samyarsadat/ROS-Robot/issues"><img src="https://img.shields.io/github/issues/samyarsadat/ROS-Robot"></a>
+	<a href="https://github.com/samyarsadat/ROS-Robot/issues"><img src="https://img.shields.io/github/issues/Cinpean/ROS_Foosball"></a>
 	<br><br>
 </p>
 
