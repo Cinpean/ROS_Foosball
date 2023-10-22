@@ -32,20 +32,20 @@ This is a 3D render of the CAD design.
 <br>
 <br>
 
-#### Stage 1 (Humble Beginnings / Follow Me)
+#### Stage 1
 The robot will follow an object with image processing and a Raspberry Pi camera.<br>
 <br>
 
-#### Stage 2 (S.L.A.M. It Shut)
-A LIDAR sensor will be added.<br>
-The robot will be able to map and navigate its environment.<br>
+#### Stage 2 
+Steppers & servos will be added.<br>
+The robot will be able to move each row of players. <br>
 <br>
 
-#### Stage 3 (Samyarm 1)
-A robotic arm will be added for object manipulation.<br>
+#### Stage 3 
+Code will be added so that the players intercept the ball.<br>
 <br>
 
-#### Stage 4 (Back To The Shipyard)
+#### Stage 4 
 After stage 3 is completed, I plan to re-design some parts of the robot chassis and PCB.<br>
 This will improve upon the current design and allow for future stages and expansions.<br>
 Most of the wiring and general design will be kept the same.<br>
@@ -59,11 +59,10 @@ More stages may be added as the project progresses.
 
 ### System Architecture and Mechanical Design Overview
 #### System Architecture
-The general architecture of the robot's electronics system consists of a main computer *(the Raspberry Pi 4B)* .
+The general architecture of the robot's electronics system consists of a main computer *(the Raspberry Pi 4 Model B)* .
 The Pi 4 handles image processing & sending information to stepper drivers<br>
 <br>
-ROS is used to handle communications between multiple nodes either on the same machine (i.e. a mapping node and a navigation node running on the Pi 4) or between external nodes (i.e. the two Raspberry Pi Picos running microROS). 
-Both Raspberry Pi Picos are connected to the Pi 4 via USB cables.<br>
+ROS is used to handle communications between multiple nodes either on the same machine or between external nodes. <br>
 <br>
 More details regarding the electronics design <a href="https://github.com/Cinpean/ROS_Foosball/tree/main/Circuit_diagam">here</a>.<br>
 <br>
