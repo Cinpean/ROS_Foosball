@@ -1,7 +1,7 @@
 # ROS_Foosball
 <h1 align="center">The ROS Foosball Table project</h1>
 <a href="https://www.ros.org"><img src="https://github.com/Cinpean/ROS_Foosball/assets/35309003/6677bf4b-b719-4ae4-bd6b-6f2c8b030856" align="left" width="640" height="171"></a>
-<a href="https://www.ros.org"><img src="https://github.com/Cinpean/ROS_Foosball/assets/35309003/29f570fe-21ea-44de-bd70-340f7aa1fd6c" align="right" alt="Size Limit logo" width="136" height="170"></a><br>
+<a href="https://www.ros.org"><img src="https://github.com/Cinpean/ROS_Foosball/assets/35309003/29f570fe-21ea-44de-bd70-340f7aa1fd6c" align="right" alt="Size Limit logo" width="136" height="170"></a><br />
 <p align="center">
 	<br>	
 	<br>
