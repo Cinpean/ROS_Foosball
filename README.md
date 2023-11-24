@@ -77,9 +77,6 @@ The chassis is 3D printed using PLA filament (more details regarding 3D printing
 You can contact me via e-mail.<br>
 E-mail: @gmail.com<br>
 
-## Contributing
-Please take a look at <a href="https://github.com/samyarsadat/ROS-Robot/blob/dev/CONTRIBUTING.md">CONTRIBUTING.md</a> for contributing.
-
 <br>
 
 ## Credits
