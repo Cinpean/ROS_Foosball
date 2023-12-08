@@ -1,0 +1,3 @@
+Aplicatia principala a programului se poate gasi sub numele de " main_ip_we_eye.py ".
+Aceasta se poate folosi doar prin live feed video de pe internet, eu folosesc aplicatia " IP Webcam " pe android ( nu am camera integrata la laptop ) sau se poate configura sa utilizeze video existent.
+Totodata aplicatia, pe baza diferentei de culoare aceasta identifica pozitia obiectului ( mingii ) si claculeaza cu ajutorul filtrului Kalman urmatoarele 3 pozitii pentru a putea determina o relativa traiectorie a acesteia, iesirea programului este o imagine pe care este desenat conturul obiectului, determinat centrul obiectului, calcularea viitoarelor poztii, si trasarea traiectoriei spra dreapta.
