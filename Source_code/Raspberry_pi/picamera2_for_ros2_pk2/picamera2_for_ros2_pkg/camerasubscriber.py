@@ -9,7 +9,7 @@ class ImageSubscriber(Node):
 
     def __init__(self):
         super().__init__("image_subscriber")
-        self.subscription = self.create_subscription(Image, '/image_tuning', self.image_callback, 10)
+        self.subscription = self.create_subscription(Image, '/image', self.image_callback, 10) #image_tuning
         self.subscription  # prevent unused variable warning
         self.bridge = CvBridge()
 

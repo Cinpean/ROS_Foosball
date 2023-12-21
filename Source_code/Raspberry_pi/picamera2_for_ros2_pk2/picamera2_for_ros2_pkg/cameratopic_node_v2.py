@@ -57,10 +57,16 @@ class ImagePublisher(Node):
         # cv2.imshow("Masked Frame", masked_frame)
 
         img_hsv = cv2.cvtColor(img,cv2.COLOR_BGR2HSV)
-        lower_blue= np.array([30,40,40]) #0,0,150
-        upper_blue= np.array([85,255,255]) #179,50,255 commented ones, for white and shades of white
+        lower_blue= np.array([0,160,50]) #0,0,150
+        upper_blue= np.array([1,255,200]) #179,50,255 commented ones, for white and shades of white
 
-        mask_blue= cv2.inRange(img_hsv, lower_blue, upper_blue)
+        lower_blue2= np.array([164,160,50]) #0,0,150
+        upper_blue2= np.array([177,255,200]) #179,50,255 commented ones, for white and shades of white
+
+        mask_blue1= cv2.inRange(img_hsv, lower_blue, upper_blue)
+        mask_blue2= cv2.inRange(img_hsv, lower_blue2, upper_blue2) 
+        
+        mask_blue = cv2.bitwise_or(mask_blue1,mask_blue2)
         res= cv2.bitwise_and(img,img,mask=mask_blue)
         contours, _ = cv2.findContours(mask_blue, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
         largest_contour = None

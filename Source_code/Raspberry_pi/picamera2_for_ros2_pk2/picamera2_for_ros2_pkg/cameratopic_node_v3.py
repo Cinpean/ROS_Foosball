@@ -1,4 +1,6 @@
 #!/usr/bin/python3
+
+# Latest updates, modified exposure time, aritificially higherd brightness level from HSV spectrum, tewaked color masking & cropped image to see only the greend space
 import rclpy
 from rclpy.node import Node
 from sensor_msgs.msg import Image
@@ -7,6 +9,8 @@ from cv_bridge import CvBridge
 import cv2
 import numpy as np
 import libcamera
+from std_msgs.msg import String
+
 
 class KalmanFilter:
     kf = cv2.KalmanFilter(4,2)
@@ -21,8 +25,33 @@ class KalmanFilter:
         x,y = int(predicted[0]), int(predicted[1])
         return x,y
 
+class Send_msg_motor(Node):
+    def __init__(self):
+        super().__init__("position_publisher")
+        self.publisher = self.create_publisher(String, 'motor_topic',10 )
+    
+    def get_keyboard_input(self):
+        return input("enter command:")
+
+    def publish_message(self,message):
+        msg = String()
+        msg.data = message
+        self.publisher.publish(msg)
+
 
 class ImagePublisher(Node):
+    lovitura = 0
+    def increase_brightness(self,hsv, value=30):
+        # hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+        h, s, v = cv2.split(hsv)
+
+        lim = 255 - value
+        v[v > lim] = 255
+        v[v <= lim] += value
+
+        final_hsv = cv2.merge((h, s, v))
+        # img = cv2.cvtColor(final_hsv, cv2.COLOR_HSV2BGR)
+        return hsv
 
     def __init__(self):
         super().__init__("image_publisher")
@@ -31,16 +60,21 @@ class ImagePublisher(Node):
         self.timer = self.create_timer(timer_period, self.timer_callback)
         self.bridge = CvBridge()
         self.cap = Picamera2()
-        video_config = self.cap.create_video_configuration(main={"size": (426, 240), "format": "RGB888"}) # change as needed
-        video_config["transform"] = libcamera.Transform(hflip=1,vflip=1)
+        # self.cap.shutter_speed = 24000
+        video_config = self.cap.create_video_configuration(main={"size": (426 , 240), "format": "RGB888"}) # change as needed 426 240
+        video_config["transform"] = libcamera.Transform(hflip=0,vflip=1)
         video_config["controls"] ["FrameDurationLimits"]= (11111, 11111) #around 90 fps ( 1000000 / 90  = 11111 ms/frame)
+        video_config["controls"]["ExposureTime"] = 40000 # max exposure time is ~37000
         self.cap.configure(video_config)
         self.cap.start()
-        x1, y1 = 200, 100
-        x2, y2 = 600, 100
-        x3, y3 = 600, 350
-        x4, y4 = 200, 350
+        x1, y1 = 23, 7
+        x2, y2 = 420, 7
+        x3, y3 = 420, 238
+        x4, y4 = 23, 238
         self.kf = KalmanFilter()
+        
+        if not ImagePublisher.lovitura:
+            ImagePublisher.lovitura = 0
 
 # Create ROI vertices array
         self.roi_vertices = np.array([[x1, y1], [x2, y2], [x3, y3], [x4, y4]], np.int32)
@@ -50,18 +84,25 @@ class ImagePublisher(Node):
         
         # adding selection area for blurring the outside of the main ball 
 
-        # img_gray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
-        # mask = np.zeros_like(img_gray)
-        # cv2.fillPoly(mask, [self.roi_vertices], 255)
-        # masked_frame = cv2.bitwise_and(img, img, mask=mask)
-        # cv2.imshow("Masked Frame", masked_frame)
+        img_gray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
+        mask = np.zeros_like(img_gray)
+        cv2.fillPoly(mask, [self.roi_vertices], 255)
+        masked_frame = cv2.bitwise_and(img, img, mask=mask)
+        # cv2.imshow("Masked Frame for sected game area", masked_frame)
 
-        img_hsv = cv2.cvtColor(img,cv2.COLOR_BGR2HSV)
-        lower_blue= np.array([30,40,40]) #0,0,150
-        upper_blue= np.array([85,255,255]) #179,50,255 commented ones, for white and shades of white
+        img_hsv = cv2.cvtColor(masked_frame,cv2.COLOR_BGR2HSV)
+        img_hsv = self.increase_brightness(img_hsv,value=60) #trying to imporve brightness
+        
+        lower_blue= np.array([165,118,100]) #0,0,150
+        upper_blue= np.array([188,255,255]) #179,50,255 commented ones, for white and shades of white
+
+        # lower_blue2= np.array([164,160,50]) #0,0,150
+        # upper_blue2= np.array([177,255,200]) #179,50,255 commented ones, for white and shades of white
 
         mask_blue= cv2.inRange(img_hsv, lower_blue, upper_blue)
-        res= cv2.bitwise_and(img,img,mask=mask_blue)
+        # mask_blue2= cv2.inRange(img_hsv, lower_blue2, upper_blue2) 
+        # mask_blue = cv2.bitwise_or(mask_blue1,mask_blue2)
+        res= cv2.bitwise_and(img_hsv,img,mask=mask_blue)
         contours, _ = cv2.findContours(mask_blue, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
         largest_contour = None
         largest_area = 0
@@ -84,9 +125,10 @@ class ImagePublisher(Node):
             if M['m00'] != 0.0:
                 x= int(M['m10']/M['m00'])
                 y= int(M['m01']/M['m00'])
+            center = (x,y)
             cv2.drawContours(img, [largest_contour], 0, (255, 0, 0), 5)
             cv2.circle(img, (x, y), 5, (0, 0, 255), thickness=cv2.FILLED)
-            cv2.putText(img,"obj center",(x,y),cv2.FONT_HERSHEY_SIMPLEX,0.5,(255,180,67),2)
+            cv2.putText(img,"Ball",(x,y),cv2.FONT_HERSHEY_SIMPLEX,0.5,(255,180,67),2)
             
             predicted = self.kf.predict(x, y)
             center_points = []
@@ -95,11 +137,11 @@ class ImagePublisher(Node):
                 # further position prediction with Kalman Filter
                 predicted = self.kf.predict(predicted[0],predicted[1])
                 center2 = (int(predicted[0]),int(predicted[1]))
-                cv2.circle(img, (predicted),8,(255,255,0),4)
+                # cv2.circle(img, (predicted),3,(255,255,0),4) #///
                 center_points.append(center2)
 
             for i in range(len(center_points) -1 ):
-                cv2.line(img,center_points[i],center_points[i+1],(100,0,100),2 )
+                # cv2.line(img,center_points[i],center_points[i+1],(100,0,100),2 )  #///
                 # print(center_points[i],center_points[i+1])
                 # print(i)
                 x1,y1 = center_points[i]
@@ -109,14 +151,19 @@ class ImagePublisher(Node):
                 C = (y1 * (x2 - x1)) - ((y2-y1) * x1)
                 if B == 0 : B = 1
 
-            for x_line in range(x,801) :
+            for x_line in range(x,440) :
                 y = int((-A * x_line - C ) / B)
-                cv2.circle(img,(x_line,y), 5 ,(255,0,255), cv2.FILLED)
+                # cv2.circle(img,(x_line,y), 1 ,(255,0,255), cv2.FILLED) #/// draw direction line for movement
 
-                # Y values from 150 & 350 and X == 600
-                if y > 150 and y <350 and x_line == 600:
-                    print("inside :",y)
-
+                # Y values from 80 & 150 and X == 
+                if y > 75 and y <165 and x_line == 404 and center > (364,y) and center<(420,y) and ImagePublisher.lovitura == 0:
+                    self.get_logger().info('inside : "%d"' % y)
+                    Send_msg_motor().publish_message('S60')
+                    ImagePublisher.lovitura = 1
+                if ImagePublisher.lovitura == 1 and center <(354,y) :
+                    ImagePublisher.lovitura = 0
+                    self.get_logger().info('inside : "%d"' % center[0])
+                    Send_msg_motor().publish_message('S0')
         # cv2.imshow("Android_cam", res)
         # cv2.imshow("grey img",img_hsv)
         
@@ -125,7 +172,10 @@ class ImagePublisher(Node):
         # height = int(img.shape[0] * scale_percent / 100)
         # dim = (width, height)
         # img = cv2.resize(img, dim, interpolation = cv2.INTER_AREA)
-        cv2.imshow("rezultat",img)
+        # cv2.imshow("rezultat",img)
+        cv2.line(img, (405, 0), (405, 240), (198, 125, 46), 5)
+        cv2.line(img,(0,120),(430,120),(200,80,176),4)
+        cv2.rectangle(img, (376, 85), (424, 159), (98, 0, 255), 3)
         self.pub.publish(self.bridge.cv2_to_imgmsg(img, "rgb8"))
         self.get_logger().info('Publishing...')
         
@@ -133,9 +183,11 @@ class ImagePublisher(Node):
 
 def main(args=None):
     rclpy.init(args=args)
+    my_publisher = Send_msg_motor()
     image_publisher = ImagePublisher()
     rclpy.spin(image_publisher)
     image_publisher.destroy_node()
+    # my_publisher.destroy_node()
     rclpy.shutdown()
     
     
