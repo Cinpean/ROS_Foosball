@@ -11,6 +11,21 @@ import numpy as np
 import libcamera
 from std_msgs.msg import String
 
+from threading import Thread
+from time import sleep
+
+def slider_for_debug():
+    cv2.namedWindow('test',cv2.WINDOW_NORMAL)
+    cv2.createTrackbar('thrs1', 'test', 100, 200, ImagePublisher.callback)   
+    ch = None
+    while ch != 27:
+        ch = cv2.waitKey(0)
+        if(ch == 96):
+            Send_msg_motor().publish_message('E1')
+    pass
+    Send_msg_motor().publish_message('E1')
+
+
 
 class KalmanFilter:
     kf = cv2.KalmanFilter(4,2)
@@ -41,6 +56,8 @@ class Send_msg_motor(Node):
 
 class ImagePublisher(Node):
     lovitura = 0
+    y_from_slider = 0
+    interpolated_steps = 0
     def increase_brightness(self,hsv, value=30):
         # hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
         h, s, v = cv2.split(hsv)
@@ -52,6 +69,13 @@ class ImagePublisher(Node):
         final_hsv = cv2.merge((h, s, v))
         # img = cv2.cvtColor(final_hsv, cv2.COLOR_HSV2BGR)
         return hsv
+    
+    def callback(x):
+        ImagePublisher.y_from_slider = x
+        value = (int(ImagePublisher.interpolate_stepper_steps( ImagePublisher.from_px_to_mm(ImagePublisher.y_from_slider))))
+        print (value)
+        result_string = f"A{value}"
+        Send_msg_motor().publish_message(result_string)
 
     def __init__(self):
         super().__init__("image_publisher")
@@ -78,6 +102,34 @@ class ImagePublisher(Node):
 
 # Create ROI vertices array
         self.roi_vertices = np.array([[x1, y1], [x2, y2], [x3, y3], [x4, y4]], np.int32)
+
+    def interpolate_stepper_steps(distance):
+        table = [(0, 0), (18, 16), (50, 32), (68, 48), (85, 64), (98, 80), (111, 96), (123, 112), (134, 128), (143, 144), (152, 160), (160, 176), (168, 192)]
+        for i in range(len(table) - 1):
+            if table[i][0] <= distance <= table[i + 1][0]:
+                d1, s1 = table[i]
+                d2, s2 = table[i + 1]
+                break
+            elif distance > table[len(table) - 1][0]:
+                d1, s1 = table[len(table) - 2]
+                d2, s2 = table[len(table) - 1]
+                break
+            else :
+                d1, s1 = table[0]
+                d2, s2 = table[0]                  
+            # if distance < table[0][0] :
+
+        # Apply linear interpolation
+        if(d2-d1 != 0):
+            ImagePublisher.interpolated_steps = s1 + ((distance - d1) * (s2 - s1) / (d2 - d1))
+            
+        if(d2-d1 == 0):
+            return ImagePublisher.interpolated_steps 
+        return ImagePublisher.interpolated_steps
+    
+    def from_px_to_mm(px_val):
+        y = ((px_val-90)*168)/69
+        return y
 
     def timer_callback(self):
         img=self.cap.capture_array()
@@ -153,17 +205,32 @@ class ImagePublisher(Node):
 
             for x_line in range(x,440) :
                 y = int((-A * x_line - C ) / B)
-                # cv2.circle(img,(x_line,y), 1 ,(255,0,255), cv2.FILLED) #/// draw direction line for movement
+                cv2.circle(img,(x_line,y), 1 ,(255,0,255), cv2.FILLED) #/// draw direction line for movement
 
                 # Y values from 80 & 150 and X == 
-                if y > 75 and y <165 and x_line == 404 and center > (364,y) and center<(420,y) and ImagePublisher.lovitura == 0:
+                if y > 75 and y < 165 and x_line == 404 and center > (364,y) and center<(420,y) and ImagePublisher.lovitura == 0:
                     self.get_logger().info('inside : "%d"' % y)
                     Send_msg_motor().publish_message('S60')
                     ImagePublisher.lovitura = 1
+
+
                 if ImagePublisher.lovitura == 1 and center <(354,y) :
                     ImagePublisher.lovitura = 0
                     self.get_logger().info('inside : "%d"' % center[0])
                     Send_msg_motor().publish_message('S0')
+                
+
+                # move around following the ball anywhere in the field, position greater than the half of the field
+                if y > 83 and y < 165 and x_line == 404 and center > (200,y) and center < (410,y):
+                    self.get_logger().info('px_ball : "%d"' % y)
+                    self.get_logger().info('px_to_mm : "%d"' % ImagePublisher.from_px_to_mm(y))
+                    value = (int(ImagePublisher.interpolate_stepper_steps( ImagePublisher.from_px_to_mm(y))))
+                    self.get_logger().info('Linear : "%d"' % value) 
+                    result_string = f"A{value}"
+                    Send_msg_motor().publish_message(result_string)
+        
+
+                
         # cv2.imshow("Android_cam", res)
         # cv2.imshow("grey img",img_hsv)
         
@@ -173,15 +240,19 @@ class ImagePublisher(Node):
         # dim = (width, height)
         # img = cv2.resize(img, dim, interpolation = cv2.INTER_AREA)
         # cv2.imshow("rezultat",img)
-        cv2.line(img, (405, 0), (405, 240), (198, 125, 46), 5)
-        cv2.line(img,(0,120),(430,120),(200,80,176),4)
+        cv2.line(img, (405, 0), (405, 240), (198, 125, 46), 2)
+        cv2.line(img,(0,120),(430,120),(200,80,176),2)
+        cv2.line(img,(350,110),(400,110),(10,10,190))
         cv2.rectangle(img, (376, 85), (424, 159), (98, 0, 255), 3)
+        cv2.line(img, (0, ImagePublisher.y_from_slider), (800, ImagePublisher.y_from_slider), (64, 80, 255), 1)
         self.pub.publish(self.bridge.cv2_to_imgmsg(img, "rgb8"))
         self.get_logger().info('Publishing...')
         
         
 
 def main(args=None):
+    thread = Thread(target= slider_for_debug)
+    thread.start()
     rclpy.init(args=args)
     my_publisher = Send_msg_motor()
     image_publisher = ImagePublisher()

@@ -81,8 +81,8 @@ void loop() {
 
     char motorId = mesaj[0];
     // Store the target positions in the "gotopostion" array
-    if (motorId == 'A') { digitalWrite(enable_pin, 0); gotoposition[0] = command*3200;  stepper1.moveTo(command*3200);}  // 800 steps - full rotation with quater-step resolution  
-    if (motorId == 'B') { digitalWrite(enable_pin, 0); gotoposition[1] = command*3200;  stepper2.moveTo(command*3200);}
+    if (motorId == 'A') { digitalWrite(enable_pin, 0); gotoposition[0] = command*100;  stepper1.moveTo(command*100);}  // 800 steps - full rotation with quater-step resolution  
+    if (motorId == 'B') { digitalWrite(enable_pin, 0); gotoposition[1] = command*3200;  stepper2.moveTo(command*100);}
     if (motorId == 'E') { digitalWrite(enable_pin, command); }
     if (motorId == 'S') { angle = command; command = 0; }
     // steppersControl.moveTo(gotoposition); // Calculates the required speed for all motors
