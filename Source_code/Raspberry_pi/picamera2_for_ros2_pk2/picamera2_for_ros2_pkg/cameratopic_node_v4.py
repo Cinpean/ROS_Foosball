@@ -143,7 +143,7 @@ class ImagePublisher(Node):
         return ImagePublisher.interpolated_steps
     
     def interpolate_stepper_steps_4(distance):
-        table = [(0, 0), (18, 40), (50, 80), (68, 120), (85, 160), (98, 200), (111, 240), (123, 280), (134, 320), (143, 360), (152, 400), (160, 440), (168, 480)]
+        table = [(0, 0), (18, 40), (54, 80), (74, 120), (90, 160), (104, 200), (116, 240), (128, 280), (139, 320), (148, 360), (157, 400), (165, 440), (170, 480)]
         for i in range(len(table) - 1):
             if table[i][0] <= distance <= table[i + 1][0]:
                 d1, s1 = table[i]
@@ -188,7 +188,7 @@ class ImagePublisher(Node):
         img_hsv = cv2.cvtColor(masked_frame,cv2.COLOR_BGR2HSV)
         img_hsv = self.increase_brightness(img_hsv,value=60) #trying to imporve brightness
         
-        lower_blue= np.array([164,88,75]) #0,0,150   #155,110,70                                               #old vals 165,118,100
+        lower_blue= np.array([155,140,70]) #164,88,75  #155,110,70                                               #old vals 165,118,100
         upper_blue= np.array([179,255,255]) #179,50,255 commented ones, for white and shades of white   #old vals 188,255,255
 
         # lower_blue2= np.array([164,160,50]) #0,0,150
@@ -235,7 +235,7 @@ class ImagePublisher(Node):
                 # cv2.circle(img,(x_line,y), 1 ,(255,0,255), cv2.FILLED) #/// draw direction line for movement
                 y = center[1]
                 # Y values from 80 & 150 and X == 
-                if y > 75 and y < 165 and x_line == 404 and center > (364,y) and center<(420,y) and ImagePublisher.lovitura == 0:
+                if y > 75 and y < 165 and x_line == 404 and center > (344,y) and center<(420,y) and ImagePublisher.lovitura == 0:
                     self.get_logger().info('inside : "%d"' % y)
                     Send_msg_motor().publish_message('S60')
                     ImagePublisher.lovitura = 1
@@ -248,7 +248,7 @@ class ImagePublisher(Node):
                 
 
                 # move around following the ball anywhere in the field, position greater than the half of the field
-                if y > 83 and y < 165 and x_line == 404 and center > (200,y) and center < (410,y):
+                if y > 83 and y < 165 and x_line == 404 and center > (170,y) and center < (410,y):
                     self.get_logger().info('px_ball : "%d"' % y)
                     self.get_logger().info('px_to_mm : "%d"' % ImagePublisher.from_px_to_mm_16(y))
                     value = (int(ImagePublisher.interpolate_stepper_steps_4( ImagePublisher.from_px_to_mm_16(y))))
@@ -333,10 +333,10 @@ class ImagePublisher(Node):
         # cv2.imshow("rezultat",img)
     # draw centerline & football quads of thr Goal Keeper 
     # & publish img to topic
-        cv2.line(img, (405, 0), (405, 240), (198, 125, 46), 2)
-        cv2.line(img,(0,120),(430,120),(200,80,176),2)
-        cv2.line(img,(350,110),(400,110),(10,10,190))
-        cv2.rectangle(img, (376, 85), (424, 159), (98, 0, 255), 3)
+        # cv2.line(img, (405, 0), (405, 240), (198, 125, 46), 2)
+        # cv2.line(img,(0,120),(430,120),(200,80,176),2)
+        # cv2.line(img,(350,110),(400,110),(10,10,190))
+        cv2.rectangle(img, (376, 85), (424, 159), (98, 0, 255), 1)
         cv2.line(img, (0, ImagePublisher.y_from_slider), (800, ImagePublisher.y_from_slider), (64, 80, 255), 1)
         # self.pub.publish(self.bridge.cv2_to_imgmsg(img, "rgb8"))
         # self.get_logger().info('Publishing...')

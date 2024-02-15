@@ -12,11 +12,11 @@ import libcamera
 from std_msgs.msg import String
 
 from threading import Thread
-from time import sleep
+# from time import sleep
 
 def slider_for_debug():
-    cv2.namedWindow('test',cv2.WINDOW_NORMAL)
-    cv2.createTrackbar('thrs1', 'test', 100, 200, ImagePublisher.callback)   
+    cv2.namedWindow('Manual_motor',cv2.WINDOW_NORMAL)
+    cv2.createTrackbar('thrs1', 'Manual_motor', 100, 200, ImagePublisher.callback)   
     ch = None
     while ch != 27:
         ch = cv2.waitKey(0)
@@ -87,7 +87,7 @@ class ImagePublisher(Node):
         # self.cap.shutter_speed = 24000
         video_config = self.cap.create_video_configuration(main={"size": (426 , 240), "format": "RGB888"}) # change as needed 426 240
         video_config["transform"] = libcamera.Transform(hflip=0,vflip=1)
-        video_config["controls"] ["FrameDurationLimits"]= (11111, 11111) #around 90 fps ( 1000000 / 90  = 11111 ms/frame)
+        video_config["controls"] ["FrameDurationLimits"]= (100000, 100000) #around 90 fps ( 1000000 / 90  = 11111 ms/frame)
         video_config["controls"]["ExposureTime"] = 40000 # max exposure time is ~37000
         self.cap.configure(video_config)
         self.cap.start()
@@ -145,8 +145,8 @@ class ImagePublisher(Node):
         img_hsv = cv2.cvtColor(masked_frame,cv2.COLOR_BGR2HSV)
         img_hsv = self.increase_brightness(img_hsv,value=60) #trying to imporve brightness
         
-        lower_blue= np.array([165,118,100]) #0,0,150
-        upper_blue= np.array([188,255,255]) #179,50,255 commented ones, for white and shades of white
+        lower_blue= np.array([148,108,70]) #0,0,150                                                    #old vals 165,118,100
+        upper_blue= np.array([179,255,255]) #179,50,255 commented ones, for white and shades of white   #old vals 188,255,255
 
         # lower_blue2= np.array([164,160,50]) #0,0,150
         # upper_blue2= np.array([177,255,200]) #179,50,255 commented ones, for white and shades of white
@@ -154,6 +154,11 @@ class ImagePublisher(Node):
         mask_blue= cv2.inRange(img_hsv, lower_blue, upper_blue)
         # mask_blue2= cv2.inRange(img_hsv, lower_blue2, upper_blue2) 
         # mask_blue = cv2.bitwise_or(mask_blue1,mask_blue2)
+        kernel = np.ones((5, 5), np.uint8)
+        mask_blue = cv2.morphologyEx(mask_blue, cv2.MORPH_OPEN, kernel)
+        mask_blue = cv2.morphologyEx(mask_blue, cv2.MORPH_CLOSE, kernel)
+
+
         res= cv2.bitwise_and(img_hsv,img,mask=mask_blue)
         contours, _ = cv2.findContours(mask_blue, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
         largest_contour = None
@@ -178,18 +183,18 @@ class ImagePublisher(Node):
                 x= int(M['m10']/M['m00'])
                 y= int(M['m01']/M['m00'])
             center = (x,y)
-            cv2.drawContours(img, [largest_contour], 0, (255, 0, 0), 5)
-            cv2.circle(img, (x, y), 5, (0, 0, 255), thickness=cv2.FILLED)
+            # cv2.drawContours(img, [largest_contour], 0, (255, 0, 0), 2)
+            cv2.circle(img, (x, y), 5, (0, 0, 255), thickness=1)
             cv2.putText(img,"Ball",(x,y),cv2.FONT_HERSHEY_SIMPLEX,0.5,(255,180,67),2)
             
             predicted = self.kf.predict(x, y)
             center_points = []
 
-            for i in range (2):
+            for i in range (4):
                 # further position prediction with Kalman Filter
                 predicted = self.kf.predict(predicted[0],predicted[1])
                 center2 = (int(predicted[0]),int(predicted[1]))
-                # cv2.circle(img, (predicted),3,(255,255,0),4) #///
+                cv2.circle(img, (predicted),1,(255,255,0),2) 
                 center_points.append(center2)
 
             for i in range(len(center_points) -1 ):
@@ -240,13 +245,16 @@ class ImagePublisher(Node):
         # dim = (width, height)
         # img = cv2.resize(img, dim, interpolation = cv2.INTER_AREA)
         # cv2.imshow("rezultat",img)
+    # draw centerline & football quads of thr Goal Keeper 
+    # & publish img to topic
         cv2.line(img, (405, 0), (405, 240), (198, 125, 46), 2)
         cv2.line(img,(0,120),(430,120),(200,80,176),2)
         cv2.line(img,(350,110),(400,110),(10,10,190))
         cv2.rectangle(img, (376, 85), (424, 159), (98, 0, 255), 3)
         cv2.line(img, (0, ImagePublisher.y_from_slider), (800, ImagePublisher.y_from_slider), (64, 80, 255), 1)
-        self.pub.publish(self.bridge.cv2_to_imgmsg(img, "rgb8"))
-        self.get_logger().info('Publishing...')
+        # self.pub.publish(self.bridge.cv2_to_imgmsg(img, "rgb8"))
+        # self.get_logger().info('Publishing...')
+        cv2.imshow("Manual_motor",img)
         
         
 
