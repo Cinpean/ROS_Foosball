@@ -33,10 +33,6 @@ void setup() {
   stepper2.setMaxSpeed(8500);
   stepper2.setAcceleration(6800);
 
-  // Adding the 3 steppers to the steppersControl instance for multi stepper control
-  // steppersControl.addStepper(stepper1);
-  // steppersControl.addStepper(stepper2);
-  // steppersControl.addStepper(stepper3);
   Serial.begin(115200,SERIAL_8N1);
   Servo1.attach(servoPin);
   char input_serial_char = 'N';
@@ -45,14 +41,11 @@ void setup() {
    if (Serial.available() > 0 ) 
       {
         input_serial_char = Serial.read();    
-        Serial.println("START" + String(input_serial_char));
+        Serial.println("START " + String(input_serial_char));
       }
   }
 
-  // stepper2.moveTo(-1200);
-
   /// run motor till the endpoint is reached
-  /// comented for the moment for testing purposes
   while (digitalRead(endpoint_pin) == HIGH) {
     stepper2.setSpeed(-1000);
     stepper2.runSpeed(); // Run the stepper motor at maximum speed

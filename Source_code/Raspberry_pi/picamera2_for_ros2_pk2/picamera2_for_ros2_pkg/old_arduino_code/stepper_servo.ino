@@ -29,9 +29,9 @@ void setup() {
 
   stepper1.setMaxSpeed(16000); // Set maximum speed value for the stepper
   stepper1.setAcceleration(8000);
-  stepper1.setSpeed(16000);
-  stepper2.setMaxSpeed(8500);
-  stepper2.setAcceleration(6800);
+  stepper1.setSpeed(10000);
+  stepper2.setMaxSpeed(1000);
+  stepper2.setAcceleration(1000);
 
   // Adding the 3 steppers to the steppersControl instance for multi stepper control
   // steppersControl.addStepper(stepper1);
@@ -39,30 +39,19 @@ void setup() {
   // steppersControl.addStepper(stepper3);
   Serial.begin(115200,SERIAL_8N1);
   Servo1.attach(servoPin);
-  char input_serial_char = 'N';
-
-  while(input_serial_char != 'S'){
-   if (Serial.available() > 0 ) 
-      {
-        input_serial_char = Serial.read();    
-        Serial.println("START" + String(input_serial_char));
-      }
-  }
-
-  // stepper2.moveTo(-1200);
 
   /// run motor till the endpoint is reached
   /// comented for the moment for testing purposes
-  while (digitalRead(endpoint_pin) == HIGH) {
-    stepper2.setSpeed(-1000);
-    stepper2.runSpeed(); // Run the stepper motor at maximum speed
-  }
 
-  stepper2.setSpeed(0);
-  stepper2.stop(); 
-  stepper2.setCurrentPosition(0);
-  digitalWrite(enable_pin, HIGH);
-  // stepper1.moveTo(-16000); // 3 steps back
+  // while (digitalRead(endpoint_pin) == HIGH) {
+  //   stepper1.setSpeed(7000);
+  //   stepper1.runSpeed(); // Run the stepper motor at maximum speed
+  // }
+
+  stepper1.setSpeed(0);
+  stepper1.stop(); 
+  stepper1.setCurrentPosition(0);
+  stepper1.moveTo(-16000); // 3 steps back
   Serial.println("stopped");
 }
 
@@ -93,7 +82,7 @@ void loop() {
     char motorId = mesaj[0];
     // Store the target positions in the "gotopostion" array
     if (motorId == 'A') { digitalWrite(enable_pin, 0); gotoposition[0] = command*100;  stepper1.moveTo(command*100);}  // 800 steps - full rotation with quater-step resolution  
-    if (motorId == 'B') { digitalWrite(enable_pin, 0); gotoposition[1] = command*10;  stepper2.moveTo(command*10);}
+    if (motorId == 'B') { digitalWrite(enable_pin, 0); gotoposition[1] = command*3200;  stepper2.moveTo(command*100);}
     if (motorId == 'E') { digitalWrite(enable_pin, command); }
     if (motorId == 'S') { angle = command; command = 0; }
     // steppersControl.moveTo(gotoposition); // Calculates the required speed for all motors

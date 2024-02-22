@@ -13,6 +13,26 @@ from std_msgs.msg import String
 from threading import Thread
 # from time import sleep
 
+# Function to calculate extended line coordinates
+def extend_line(x1, y1, x2, y2, length):
+    # Calculate vector components
+    dx = x2 - x1
+    dy = y2 - y1
+    
+    # Calculate unit vector
+    magnitude = np.sqrt(dx ** 2 + dy ** 2)
+    if magnitude > 0:
+        ux = dx / magnitude
+        uy = dy / magnitude
+    else:
+        ux, uy = 0, 0
+    
+    # Extend line
+    x3 = x2 + ux * length
+    y3 = y2 + uy * length
+    
+    return int(x3), int (y3)
+
 def slider_for_debug():
     cv2.namedWindow('Manual_motor',cv2.WINDOW_NORMAL)
     cv2.createTrackbar('thrs1', 'Manual_motor', 100, 200, ImagePublisher.callback)   
@@ -143,7 +163,7 @@ class ImagePublisher(Node):
         return ImagePublisher.interpolated_steps
     
     def interpolate_stepper_steps_4(distance):
-        table = [(0, 0), (18, 40), (54, 80), (74, 120), (90, 160), (104, 200), (116, 240), (128, 280), (139, 320), (148, 360), (157, 400), (165, 440), (170, 480)]
+        table = [(0, 0), (18, 40), (54, 80), (74, 120), (90, 160), (104, 200), (116, 240), (128, 280), (139, 320), (148, 360), (157, 400), (165, 440), (170, 450)]
         for i in range(len(table) - 1):
             if table[i][0] <= distance <= table[i + 1][0]:
                 d1, s1 = table[i]
@@ -228,7 +248,11 @@ class ImagePublisher(Node):
             ImagePublisher.future_object_positions.append(predicted) #used only for display
             cv2.circle(img, (int(predicted[0]),int(predicted[1])), 3, (200, 30, 90), 2)
             cv2.line(img,(center[0], center[1]), (int(predicted[0]),int(predicted[1])),(23,10,255), 2)
-            cv2.line(img, (center[0], center[1]), (center[0]+400, center[1]), (64, 80, 255), 4)
+            cv2.line(img, (center[0], center[1]), (center[0]+400, center[1]), (64, 80, 10), 4)
+            
+            x3, y3 = extend_line(center[0], center[1], int(predicted[0]),int(predicted[1]), 80)
+            cv2.line(img, (int(predicted[0]),int(predicted[1])), (x3, y3), (250, 250, 0), 2)
+
             
             for x_line in range(x,440) :
                 # y = int((-A * x_line - C ) / B)
@@ -249,16 +273,24 @@ class ImagePublisher(Node):
 
                 # move around following the ball anywhere in the field, position greater than the half of the field
                 if y > 83 and y < 165 and x_line == 404 and center > (170,y) and center < (410,y):
-                    self.get_logger().info('px_ball : "%d"' % y)
-                    self.get_logger().info('px_to_mm : "%d"' % ImagePublisher.from_px_to_mm_16(y))
-                    value = (int(ImagePublisher.interpolate_stepper_steps_4( ImagePublisher.from_px_to_mm_16(y))))
-                    self.get_logger().info('Linear : "%d"' % value) 
-                    result_string = f"B{value}"
-                    Send_msg_motor().publish_message(result_string)
+                    if x3 >= 400 and y3 > 83 and y3 < 165 :
+                        self.get_logger().info('px_ball_prediction : "%d"' % y3)
+                        self.get_logger().info('px_to_mm_prediction : "%d"' % ImagePublisher.from_px_to_mm_16(y3))
+                        value = (int(ImagePublisher.interpolate_stepper_steps_4( ImagePublisher.from_px_to_mm_16(y3))))
+                        self.get_logger().info('Linear_prediction : "%d"' % value) 
+                        result_string = f"B{value}"
+                        Send_msg_motor().publish_message(result_string)
+                    else :
+                        self.get_logger().info('px_ball : "%d"' % y)
+                        self.get_logger().info('px_to_mm : "%d"' % ImagePublisher.from_px_to_mm_16(y))
+                        value = (int(ImagePublisher.interpolate_stepper_steps_4( ImagePublisher.from_px_to_mm_16(y))))
+                        self.get_logger().info('Linear : "%d"' % value) 
+                        result_string = f"B{value}"
+                        Send_msg_motor().publish_message(result_string)
 
 
-        for i in range(1, len(ImagePublisher.object_positions)):
-            cv2.line(img, ImagePublisher.object_positions[i - 1], ImagePublisher.object_positions[i], (0, 255, 0), 2)
+        # for i in range(1, len(ImagePublisher.object_positions)):
+            # cv2.line(img, ImagePublisher.object_positions[i - 1], ImagePublisher.object_positions[i], (0, 255, 0), 2)
 
         
 
