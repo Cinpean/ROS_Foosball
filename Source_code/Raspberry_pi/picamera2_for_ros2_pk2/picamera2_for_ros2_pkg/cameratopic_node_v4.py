@@ -66,13 +66,21 @@ class Send_msg_motor(Node):
         super().__init__("position_publisher")
         self.publisher = self.create_publisher(String, 'motor_topic',10 )
     
-    def get_keyboard_input(self):
-        return input("enter command:")
-
     def publish_message(self,message):
         msg = String()
         msg.data = message
         self.publisher.publish(msg)
+
+class Send_msg_scoreborad(Node):
+    def __init__(self):
+        super().__init__("scoreboard_publisher")
+        self.publisher_scoreboard = self.create_publisher(String, 'scoreboard_topic',10 )
+    
+    def publish_message_scoreboard(self,message):
+        msg = String()
+        msg.data = message
+        self.publisher_scoreboard.publish(msg)
+
 
 
 class ImagePublisher(Node):
@@ -227,7 +235,7 @@ class ImagePublisher(Node):
         img_hsv = cv2.cvtColor(masked_frame,cv2.COLOR_BGR2HSV)
         img_hsv = self.increase_brightness(img_hsv,value=80) #trying to imporve brightness
         
-        lower_blue= np.array([164,140,65]) #164,88,75  #155,140,70  #155,81,49 for high light enviromnet                                  #old vals 165,118,100
+        lower_blue= np.array([162,50,64]) #164,88,75  #155,140,70  #155,81,49 for high light enviromnet                                  #old vals 165,118,100
         upper_blue= np.array([179,255,255]) #179,50,255 commented ones, for white and shades of white   #old vals 188,255,255
 
         mask_blue= cv2.inRange(img_hsv, lower_blue, upper_blue)
@@ -263,7 +271,7 @@ class ImagePublisher(Node):
             cv2.line(img,(center[0], center[1]), (int(predicted[0]),int(predicted[1])),(23,10,255), 2)
             cv2.line(img, (center[0], center[1]), (center[0]+400, center[1]), (64, 80, 10), 4)
             
-            x3, y3 = extend_line(center[0], center[1], int(predicted[0]),int(predicted[1]), 80)
+            x3, y3 = extend_line(center[0], center[1], int(predicted[0]),int(predicted[1]), 50)
             cv2.line(img, (int(predicted[0]),int(predicted[1])), (x3, y3), (250, 250, 0), 2)
 
             
@@ -283,14 +291,15 @@ class ImagePublisher(Node):
 
                 # move around following the ball anywhere in the field, position greater than the half of the field
                 # x,y coordonates of the center of the ball 
-                if y > 83 and y < 160 and x_line == 404 and center > (170,y) and center < (410,y):
+                if y > 83 and y < 160 and x_line == 404 and center > (170,y) and center < (420,y):
                     
                     # script used for determining the intersection of the prediction line with the GK line
-                    if x3 != center[0] and x3 > 390 and y3 > 89 and y3 < 160 :
+                    if x3 != center[0] and x3 > 385 and y3 > 70 and y3 < 170 :
                         intersection_point_y = int((((y3-center[1])/(x3-center[0]))*(404-center[0]))+center[1])
                         if intersection_point_y > 0: 
                             self.get_logger().info('Intersected w 404 : "%d"' % intersection_point_y)
-                            value = (int(ImagePublisher.interpolate_stepper_steps_2( ImagePublisher.from_px_to_mm_16(y3))))
+                            self.get_logger().info('x3 position : "%d"' % x3)
+                            value = (int(ImagePublisher.interpolate_stepper_steps_2( ImagePublisher.from_px_to_mm_16(intersection_point_y))))
                             result_string = f"B{value}"
                             Send_msg_motor().publish_message(result_string)
 
@@ -309,6 +318,7 @@ class ImagePublisher(Node):
                         self.get_logger().info('Linear : "%d"' % value) 
                         result_string = f"B{value}"
                         Send_msg_motor().publish_message(result_string)
+                       
 
         # draws the path the ball has taken
         # for i in range(1, len(ImagePublisher.object_positions)):
@@ -335,10 +345,13 @@ def main(args=None):
     thread.start()
     rclpy.init(args=args)
     my_publisher = Send_msg_motor()
+    # scoreboard_publisher = Send_msg_scoreborad()
     image_publisher = ImagePublisher()
     rclpy.spin(image_publisher)
+    rclpy.spin(my_publisher)
     image_publisher.destroy_node()
-    # my_publisher.destroy_node()
+    my_publisher.destroy_node()
+    # scoreboard_publisher.destroy_node()
     rclpy.shutdown()
     
     
