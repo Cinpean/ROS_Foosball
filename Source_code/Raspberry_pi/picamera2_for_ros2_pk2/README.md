@@ -17,6 +17,8 @@ Use `colcon build` to build the package then `source install/setup.bash`.<br>
 
 Lastly type `ros2 run picamera2_for_ros2_pkg cameratotopic_node` to start the node.<br><br>
 
+To run the entire program at once with all the desired topics, run : `ros2 launch picamera2_for_ros2_pkg fussball.launch.py`, a launch file.
+
 Check your topic with `ros2 topic echo /image`.
 
 ## Known issues
