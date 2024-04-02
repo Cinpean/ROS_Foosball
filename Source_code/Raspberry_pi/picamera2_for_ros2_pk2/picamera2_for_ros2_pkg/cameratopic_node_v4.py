@@ -35,8 +35,8 @@ def extend_line(x1, y1, x2, y2, length):
 # definision of sliders used for moving manually the GK in order to test movement
 def slider_for_debug():
     cv2.namedWindow('Manual_motor',cv2.WINDOW_NORMAL)
-    cv2.createTrackbar('thrs1', 'Manual_motor', 100, 200, ImagePublisher.callback)   
-    cv2.createTrackbar('thrs2', 'Manual_motor', 100, 200, ImagePublisher.callback_2)   
+    cv2.createTrackbar('Start > 150', 'Manual_motor', 100, 200, ImagePublisher.callback)   
+    cv2.createTrackbar('GK Position', 'Manual_motor', 100, 200, ImagePublisher.callback_2)   
     ch = None
     while ch != 27:
         ch = cv2.waitKey(0)
@@ -89,6 +89,8 @@ class ImagePublisher(Node):
     future_object_positions = []  #used only for display
     object_positions = [] #used only for display
     interpolated_steps = 0
+    started = False
+    Goal = 0
     def increase_brightness(self,hsv, value):
         # hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
         h, s, v = cv2.split(hsv)
@@ -103,10 +105,12 @@ class ImagePublisher(Node):
     
     def callback(x):
         ImagePublisher.y_from_slider = x
-        value = (int(ImagePublisher.interpolate_stepper_steps_16( ImagePublisher.from_px_to_mm_16(ImagePublisher.y_from_slider))))
-        print (value)
-        result_string = f"A{value}"
-        Send_msg_motor().publish_message(result_string)
+        if x == 150 and ImagePublisher.started == False :
+            Send_msg_motor().publish_message('S')
+            ImagePublisher.started = True
+
+        if x == 90:
+            Send_msg_motor().publish_message('H')
 
     def callback_4(x):
         ImagePublisher.y_from_slider = x
@@ -294,12 +298,12 @@ class ImagePublisher(Node):
                 if y > 83 and y < 160 and x_line == 404 and center > (170,y) and center < (420,y):
                     
                     # script used for determining the intersection of the prediction line with the GK line
-                    if x3 != center[0] and x3 > 385 and y3 > 70 and y3 < 170 :
+                    if x3 != center[0] and x3 > 375 and y3 > 70 and y3 < 170 :
                         intersection_point_y = int((((y3-center[1])/(x3-center[0]))*(404-center[0]))+center[1])
                         if intersection_point_y > 0: 
                             self.get_logger().info('Intersected w 404 : "%d"' % intersection_point_y)
                             self.get_logger().info('x3 position : "%d"' % x3)
-                            value = (int(ImagePublisher.interpolate_stepper_steps_2( ImagePublisher.from_px_to_mm_16(intersection_point_y))))
+                            value = (round(ImagePublisher.interpolate_stepper_steps_2( ImagePublisher.from_px_to_mm_16(intersection_point_y))))
                             result_string = f"B{value}"
                             Send_msg_motor().publish_message(result_string)
 
@@ -314,10 +318,28 @@ class ImagePublisher(Node):
                     else :
                         self.get_logger().info('px_ball : "%d"' % y)
                         self.get_logger().info('px_to_mm : "%d"' % ImagePublisher.from_px_to_mm_16(y))
-                        value = (int(ImagePublisher.interpolate_stepper_steps_2( ImagePublisher.from_px_to_mm_16(y))))
+                        value = (round(ImagePublisher.interpolate_stepper_steps_2( ImagePublisher.from_px_to_mm_16(y))))
                         self.get_logger().info('Linear : "%d"' % value) 
                         result_string = f"B{value}"
                         Send_msg_motor().publish_message(result_string)
+
+                #checker and publisher if the ball falls into the net of team 1
+                elif ImagePublisher.Goal == 0 and center[0] > 413 and center[1] > 83 and center[1] < 160 :
+                    self.get_logger().info('GOOOOL Human team')
+                    result_string = f"{1}"
+                    ImagePublisher.Goal = 1
+                    Send_msg_scoreborad().publish_message_scoreboard(result_string)
+
+                #checker and publisher if the ball falls into the net of team 2
+                elif ImagePublisher.Goal == 0 and center[0] > 20 and center[0] < 34 and center[1] > 83 and center[1] < 160 :
+                    self.get_logger().info('GOOOOL Robot team')
+                    result_string = f"{2}"
+                    ImagePublisher.Goal = 1
+                    Send_msg_scoreborad().publish_message_scoreboard(result_string)
+                
+                #reset Goalboolean to send only once the signal to mark the goal
+                elif ImagePublisher.Goal == 1 and center[0] > 50 and center[0]< 300:
+                    ImagePublisher.Goal = 0 
                        
 
         # draws the path the ball has taken
@@ -345,10 +367,11 @@ def main(args=None):
     thread.start()
     rclpy.init(args=args)
     my_publisher = Send_msg_motor()
-    # scoreboard_publisher = Send_msg_scoreborad()
+    scoreboard_publisher = Send_msg_scoreborad()
     image_publisher = ImagePublisher()
     rclpy.spin(image_publisher)
     rclpy.spin(my_publisher)
+    rclpy.spin(scoreboard_publisher)
     image_publisher.destroy_node()
     my_publisher.destroy_node()
     # scoreboard_publisher.destroy_node()

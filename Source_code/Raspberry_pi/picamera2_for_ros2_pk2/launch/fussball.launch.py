@@ -19,11 +19,17 @@ def generate_launch_description():
         executable="cameratopic_node_v4"
     )
 
+    Scoreboard = Node(
+        package="picamera2_for_ros2_pkg",
+        executable="Score_board_v2"
+    )
+
 
 
     ld.add_action(serial_publisher)
     ld.add_action(serial_subscriber)
     ld.add_action(camera_v4)
+    ld.add_action(Scoreboard)
 
     return ld
 
