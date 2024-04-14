@@ -28,7 +28,7 @@ This is a 3D render of the CAD design.
 
 ### Stages
 ***This project will be completed in stages.***<br>
-*The project is currently at stage 2.*<br>
+*The project is currently at stage 4.*<br>
 <br>
 <br>
 
