@@ -19,7 +19,7 @@ The ROS Robot project.
 <br>
 <br>
 <br>
-<img src="https://raw.githubusercontent.com/Cinpean/ROS_Foosball/main/Assets/Renders_img/Foosball_V5.JPG?token=GHSAT0AAAAAACNMGPMPGHRFCIW5EXBIYL46ZQ3UJJQ">
+<img src="https://raw.githubusercontent.com/Cinpean/ROS_Foosball/main/Assets/Renders_img/Foosball_V5.JPG?token=GHSAT0AAAAAACNMGPMOJJMQLYWU4QOWKIRUZQ44GHA">
 This is a 3D render of the CAD design.
 <br>
 <br>
